@@ -77,7 +77,6 @@ test("can store and load item", () => {
 test("can delete item", () => {
 
   localRestDelete("users", 1);
-  console.log(localRestGet<User>("users"))
 
   expect(localRestGet<User>("users").length).toStrictEqual(0);
 });
@@ -93,7 +92,93 @@ test("deleting first items returns new item", () => {
   localRestDelete("users", 1);
 
 
-  console.log(localRestGet<User>("users"))
 
   expect(localRestGet<User>("users")[0]).toStrictEqual({ ...user, id: 2 });
+});
+
+
+test("dont overwrite initial values", () => {
+  const olga = {
+    id: 1,
+    name: "Olga",
+    age: 81
+  }
+  const store = {
+    "users":
+      JSON.stringify({ currentIndex: 2, values: [olga] })
+  } as { [key: string]: string };
+
+  function save(key: string, value: string) {
+    store[key] = value;
+  }
+
+  function load(key: string) {
+    return store[key];
+  }
+
+
+  createLocalREST(save, load, {
+    users,
+    "accounts": [{
+      name: "Dags account",
+      number: 123432123343
+    }],
+    "contacts": [{
+      name: "Test account",
+      number: 321222332323
+    }],
+    "payments": [{
+      from: "Dags account",
+      to: "Test account",
+      amount: 123,
+      message: "test"
+    }]
+  });
+
+  expect(localRestGet<User>("users")[0]).toStrictEqual(olga);
+});
+
+
+
+
+test(" overwrite initial values", () => {
+  const olga = {
+    id: 1,
+    name: "Olga",
+    age: 81
+  }
+  const store = {
+    "users":
+      JSON.stringify({ currentIndex: 2, values: [olga] })
+  } as { [key: string]: string };
+
+  function save(key: string, value: string) {
+    store[key] = value;
+  }
+
+  function load(key: string) {
+    return store[key];
+  }
+
+
+  createLocalREST(save, load, {
+    users,
+    "accounts": [{
+      name: "Dags account",
+      number: 123432123343
+    }],
+    "contacts": [{
+      name: "Test account",
+      number: 321222332323
+    }],
+    "payments": [{
+      from: "Dags account",
+      to: "Test account",
+      amount: 123,
+      message: "test"
+    }]
+  },
+    true);
+
+  expect(localRestGet<User>("users")).toStrictEqual(users);
 });

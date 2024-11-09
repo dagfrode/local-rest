@@ -25,17 +25,31 @@ type AsIdOrIds<T> = T extends any[] ? number[] : number;
 export function createLocalREST(
   save: SharedFunctions["save"],
   load: SharedFunctions["load"],
-  initialValues: { [key: string]: any[] }
+  initialValues?: { [key: string]: any[] },
+  overwriteStore?: boolean
 ) {
   sharedFunctions.save = save;
   sharedFunctions.load = load;
-  Object.entries(initialValues).forEach(([index, value]) => {
-    localRestPost(index, value)
-  })
+  if (initialValues) {
+
+    Object.entries(initialValues).forEach(([index, value]) => {
+      if (overwriteStore || !load(index)) {
+        let currentIndex = 1
+        const storable = value.reduce((acc, item) => {
+          item.id = currentIndex
+          acc[currentIndex] = item
+          currentIndex++
+          return acc
+
+        }, {})
+        save(index, JSON.stringify({ values: storable, currentIndex }))
+      }
+    })
+  }
 
 }
 
-type StorageWrapper<T> = {
+export type StorageWrapper<T> = {
   values: { [key: number]: WithId<T> },
   currentIndex: number
 }
