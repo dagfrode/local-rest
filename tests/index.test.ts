@@ -1,4 +1,4 @@
-import { createLocalREST, localRestDelete, localRestGet, localRestPost, localRestPut } from "../src/index";
+import { createLocalREST, localRESTDelete, localRESTGet, localRESTPost, localRESTPut } from "../src/index";
 
 const users = [{
   name: "Dag",
@@ -47,7 +47,7 @@ type User = {
 
 test("can get initial values", () => {
   const val = [{ ...users[0], id: 1 }]
-  expect(localRestGet<User>("users")).toStrictEqual(val);
+  expect(localRESTGet<User>("users")).toStrictEqual(val);
 });
 
 
@@ -57,9 +57,9 @@ test("can store and load item", () => {
     name: "Dag 2",
     age: 23,
   };
-  localRestPost("users", [user]);
+  localRESTPost("users", [user]);
   const appendedUsers = [{ ...users[0], id: 1 }, { ...user, id: 2 }]
-  expect(localRestGet<User>("users")).toStrictEqual(appendedUsers);
+  expect(localRESTGet<User>("users")).toStrictEqual(appendedUsers);
 });
 
 
@@ -69,16 +69,16 @@ test("can store and load item", () => {
     name: "Dag 2",
     age: 23,
   };
-  localRestPut("users", user);
+  localRESTPut("users", user);
 
-  expect(localRestGet<User>("users", 0)[0]).toStrictEqual(user);
+  expect(localRESTGet<User>("users", 0)[0]).toStrictEqual(user);
 });
 
 test("can delete item", () => {
 
-  localRestDelete("users", 1);
+  localRESTDelete("users", 1);
 
-  expect(localRestGet<User>("users").length).toStrictEqual(0);
+  expect(localRESTGet<User>("users").length).toStrictEqual(0);
 });
 
 
@@ -88,12 +88,12 @@ test("deleting first items returns new item", () => {
     age: 23,
   };
 
-  localRestPost("users", [user]);
-  localRestDelete("users", 1);
+  localRESTPost("users", [user]);
+  localRESTDelete("users", 1);
 
 
 
-  expect(localRestGet<User>("users")[0]).toStrictEqual({ ...user, id: 2 });
+  expect(localRESTGet<User>("users")[0]).toStrictEqual({ ...user, id: 2 });
 });
 
 
@@ -135,7 +135,7 @@ test("dont overwrite initial values", () => {
     }]
   });
 
-  expect(localRestGet<User>("users")[0]).toStrictEqual(olga);
+  expect(localRESTGet<User>("users")[0]).toStrictEqual(olga);
 });
 
 
@@ -180,5 +180,5 @@ test(" overwrite initial values", () => {
   },
     true);
 
-  expect(localRestGet<User>("users")).toStrictEqual(users);
+  expect(localRESTGet<User>("users")).toStrictEqual(users);
 });
